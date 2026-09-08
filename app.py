@@ -3,8 +3,6 @@ import pandas as pd
 import json
 import os
 from datetime import datetime, timedelta
-import plotly.express as px
-import plotly.graph_objects as go
 
 # Data file paths
 DATA_FILE = 'data.json'
@@ -62,11 +60,13 @@ def get_days_diff(target_date_str):
 
 def get_status_info(days_left):
     if days_left < 0:
-        return "Overdue", "🔴", "overdue"
+        return "🔴 Overdue", "overdue"
+    elif days_left == 0:
+        return "🟡 Expires Today!", "warning"
     elif days_left <= 60:
-        return f"Expiring ({days_left}d)", "🟡", "warning"
+        return f"🟡 Expiring ({days_left}d)", "warning"
     else:
-        return f"Active ({days_left}d)", "🟢", "active"
+        return f"🟢 Active ({days_left}d)", "active"
 
 def check_notifications_manual():
     """Manually check notifications and save them"""
@@ -157,12 +157,7 @@ def main():
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             text-align: center;
-            transition: transform 0.2s;
             border: 1px solid #E5E7EB;
-        }
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .stat-number {
             font-size: 2rem;
@@ -172,6 +167,25 @@ def main():
         .stat-label {
             color: #6B7280;
             font-size: 0.875rem;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-overdue {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        .status-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        .status-active {
+            background: #D1FAE5;
+            color: #065F46;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -315,17 +329,17 @@ def main():
     if filtered_entries:
         # Prepare data for display
         table_data = []
-        for idx, entry in enumerate(filtered_entries):
+        for entry in filtered_entries:
             days_left = get_days_diff(entry.get('nextYear', ''))
-            status, icon, status_type = get_status_info(days_left)
+            status_display, status_type = get_status_info(days_left)
             
             # Get color for status
             if status_type == 'overdue':
-                status_display = f"🔴 {status}"
+                status_class = "status-overdue"
             elif status_type == 'warning':
-                status_display = f"🟡 {status}"
+                status_class = "status-warning"
             else:
-                status_display = f"🟢 {status}"
+                status_class = "status-active"
             
             table_data.append({
                 'Contract No': entry.get('no', ''),
@@ -335,15 +349,14 @@ def main():
                 'Remark': entry.get('remark', ''),
                 'Days Left': days_left if days_left < 999 else 'N/A',
                 'Status': status_display,
-                '_index': idx,
-                '_status_type': status_type
+                '_status_class': status_class
             })
         
         df = pd.DataFrame(table_data)
         
-        # Display table
+        # Display table with HTML formatting for status
         st.dataframe(
-            df.drop(columns=['_index', '_status_type']),
+            df.drop(columns=['_status_class']),
             column_config={
                 'Contract No': st.column_config.TextColumn('Contract No', width='small'),
                 'Name': st.column_config.TextColumn('Name', width='medium'),
@@ -426,7 +439,7 @@ def main():
                 st.success("✅ All notifications cleared!")
                 st.rerun()
     
-    # Dashboard Charts
+    # Dashboard Charts (using native Streamlit)
     st.divider()
     st.subheader("📊 Contract Analytics")
     
@@ -434,50 +447,27 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             # Status distribution
-            status_counts = {
-                'Active (60+ days)': active,
-                'Expiring Soon (≤60 days)': warning,
-                'Overdue': overdue
+            status_data = {
+                'Status': ['Active (60+ days)', 'Expiring Soon (≤60 days)', 'Overdue'],
+                'Count': [active, warning, overdue]
             }
             if total > 0:
-                fig = px.pie(
-                    values=list(status_counts.values()),
-                    names=list(status_counts.keys()),
-                    title='Contract Status Distribution',
-                    color_discrete_sequence=['#10B981', '#F59E0B', '#EF4444']
-                )
-                fig.update_traces(textposition='inside', textinfo='percent+label')
-                fig.update_layout(height=400)
-                st.plotly_chart(fig, use_container_width=True)
+                st.bar_chart(pd.DataFrame(status_data).set_index('Status'))
         
         with col2:
-            # Days left distribution
+            # Days left data
             days_data = []
             for entry in entries:
                 days = get_days_diff(entry.get('nextYear', ''))
                 if days < 999:
                     days_data.append({
                         'Contract': f"{entry.get('no', '')}",
-                        'Name': entry.get('name', ''),
                         'Days Left': days
                     })
             if days_data:
                 df_days = pd.DataFrame(days_data)
-                # Sort by days left
                 df_days = df_days.sort_values('Days Left')
-                
-                colors = ['#EF4444' if d < 0 else '#F59E0B' if d <= 60 else '#10B981' for d in df_days['Days Left']]
-                
-                fig = px.bar(
-                    df_days,
-                    x='Contract',
-                    y='Days Left',
-                    title='Days Until Expiry',
-                    color_discrete_sequence=['#4F46E5']
-                )
-                fig.update_traces(marker_color=colors)
-                fig.update_layout(height=400, xaxis_tickangle=-45)
-                st.plotly_chart(fig, use_container_width=True)
+                st.bar_chart(df_days.set_index('Contract'))
             else:
                 st.info("No valid expiry dates to display")
     else:
