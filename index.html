@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Tracker Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #818CF8;
+            --secondary: #7C3AED;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 50%, #F3E8FF 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: var(--gray-800);
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            max-width: 1400px;
+            margin: 0 auto 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-brand-text {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--gray-900);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-brand-text span {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            padding: 0;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .stat-item {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-right: 1px solid var(--gray-200);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-item:hover {
+            background: var(--gray-50);
+            transform: translateY(-2px);
+        }
+
+        .stat-item.active-filter {
+            background: var(--gray-50);
+            box-shadow: inset 0 -3px 0 var(--primary);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .stat-item:hover .stat-icon {
+            transform: scale(1.05);
+        }
+
+        .stat-icon.total { background: #E0E7FF; color: var(--primary); }
+        .stat-icon.active { background: #D1FAE5; color: var(--success); }
+        .stat-icon.warning { background: #FEF3C7; color: var(--warning); }
+        .stat-icon.overdue { background: #FEE2E2; color: var(--danger); }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        /* Quick Search Info */
+        .quick-search-info {
+            display: none;
+            padding: 8px 16px;
+            background: #EEF2FF;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 13px;
+            color: var(--gray-600);
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .quick-search-info.active {
+            display: flex;
+        }
+
+        .quick-search-info .clear-search {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .quick-search-info .clear-search:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 24px 32px 32px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .section-title .badge {
+            background: var(--gray-100);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #D97706);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .form-section:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+        }
+
+        .form-group input {
+            padding: 8px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+            background: white;
+            color: var(--gray-800);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group input:read-only {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            background: white;
+        }
+
+        .table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .table-wrapper thead {
+            background: linear-gradient(135deg, var(--gray-50), white);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .table-wrapper th {
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-wrapper td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .table-wrapper tbody tr {
+            transition: var(--transition);
+        }
+
+        .table-wrapper tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .table-wrapper tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .contract-no {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-badge .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-safe {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-safe .dot {
+            background: var(--success);
+        }
+
+        .status-warning {
+            background: #FEF3C7;
+            color: #92400E;
+            animation: pulse-warning 2s infinite;
+        }
+
+        .status-warning .dot {
+            background: var(--warning);
+        }
+
+        .status-overdue {
+            background: #FEE2E2;
+            color: #991B1B;
+            animation: pulse-overdue 1.5s infinite;
+        }
+
+        .status-overdue .dot {
+            background: var(--danger);
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes pulse-overdue {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.02); }
+        }
+
+        /* Action Buttons in Table */
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-size: 13px;
+        }
+
+        .btn-delete:hover {
+            background: #FEE2E2;
+            color: var(--danger);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 640px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: calc(90vh - 70px);
+            overflow-y: auto;
+        }
+
+        /* Notification Items */
+        .notification-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .notification-summary-card {
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+
+        .notification-summary-card.overdue {
+            background: #FEE2E2;
+            border: 1px solid #FCA5A5;
+        }
+
+        .notification-summary-card.upcoming {
+            background: #FEF3C7;
+            border: 1px solid #FCD34D;
+        }
+
+        .notification-summary-card .number {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .notification-summary-card .label {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .notification-group {
+            margin-bottom: 16px;
+        }
+
+        .notification-group-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            padding: 6px 0;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 10px;
+        }
+
+        .notification-item {
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            border-left: 4px solid var(--gray-300);
+            background: var(--gray-50);
+            transition: var(--transition);
+        }
+
+        .notification-item:hover {
+            transform: translateX(4px);
+        }
+
+        .notification-item.overdue {
+            border-left-color: var(--danger);
+            background: #FEF2F2;
+        }
+
+        .notification-item.upcoming {
+            border-left-color: var(--warning);
+            background: #FFFBEB;
+        }
+
+        .notification-item .title {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 13px;
+        }
+
+        .notification-item .message {
+            color: var(--gray-600);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .notification-item .action {
+            font-weight: 600;
+            font-size: 11px;
+            margin-top: 4px;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .notification-item .action.urgent {
+            background: #FEE2E2;
+            color: var(--danger);
+        }
+
+        .notification-item .action.prepare {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .notification-item .meta {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            color: var(--gray-300);
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: var(--gray-600);
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            color: var(--gray-400);
+            font-size: 13px;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: white;
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 240px;
+            max-width: 380px;
+            animation: slideInRight 0.4s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        .toast-icon {
+            font-size: 18px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--gray-900);
+        }
+
+        .toast-message {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-item:nth-child(2) {
+                border-right: none;
+            }
+            
+            .stat-item:nth-child(3) {
+                border-top: 1px solid var(--gray-200);
+                border-right: 1px solid var(--gray-200);
+            }
+            
+            .stat-item:nth-child(4) {
+                border-top: 1px solid var(--gray-200);
+                border-right: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stat-item {
+                padding: 14px 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--gray-200);
+            }
+            
+            .stat-item:nth-child(odd) {
+                border-right: 1px solid var(--gray-200);
+            }
+            
+            .stat-item:nth-child(3),
+            .stat-item:nth-child(4) {
+                border-bottom: none;
+            }
+            
+            .stat-number {
+                font-size: 20px;
+            }
+            
+            .stat-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
+            }
+            
+            .main-content {
+                padding: 16px 20px 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .header-actions .btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 100px;
+            }
+            
+            .notification-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-wrapper td, 
+            .table-wrapper th {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            
+            .top-nav {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .nav-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stat-item {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            
+            .stat-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+            
+            .stat-number {
+                font-size: 17px;
+            }
+            
+            .stat-label {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+    <a href="#" class="nav-brand">
+        <div class="nav-brand-icon">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="nav-brand-text">Contract<span>Tracker</span></div>
+    </a>
+    <div class="nav-actions">
+        <button class="btn btn-primary btn-sm" onclick="showNotifications()">
+            <i class="fas fa-bell"></i>
+            <span id="notificationCount" style="background: var(--danger); color: white; padding: 1px 8px; border-radius: 12px; font-size: 11px; margin-left: 4px;">0</span>
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="clearAllNotifications()">
+            <i class="fas fa-trash-alt"></i> Clear
+        </button>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-item" data-filter="all" onclick="applyFilter('all')">
+            <div class="stat-icon total"><i class="fas fa-file-contract"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" id="totalContracts">0</span>
+                <span class="stat-label">Total Contracts</span>
+            </div>
+        </div>
+        <div class="stat-item" data-filter="active" onclick="applyFilter('active')">
+            <div class="stat-icon active"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" id="activeContracts">0</span>
+                <span class="stat-label">Active (60+ days)</span>
+            </div>
+        </div>
+        <div class="stat-item" data-filter="warning" onclick="applyFilter('warning')">
+            <div class="stat-icon warning"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" id="warningContracts">0</span>
+                <span class="stat-label">Expiring Soon (≤60 days)</span>
+            </div>
+        </div>
+        <div class="stat-item" data-filter="overdue" onclick="applyFilter('overdue')">
+            <div class="stat-icon overdue"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" id="overdueContracts">0</span>
+                <span class="stat-label">Overdue</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Search Info Bar -->
+    <div class="quick-search-info" id="quickSearchInfo">
+        <span>
+            <i class="fas fa-search" style="color: var(--primary);"></i>
+            Showing: <strong id="filterDisplay">All Contracts</strong>
+            (<span id="filteredCount">0</span> records)
+        </span>
+        <span class="clear-search" onclick="applyFilter('all')">Clear Filter ×</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Section Header -->
+        <div class="section-header">
+            <div class="section-title">
+                <h2><i class="fas fa-list-ul" style="color: var(--primary);"></i> Contract List</h2>
+                <span class="badge" id="recordCount">0 records</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-warning btn-sm" onclick="checkNotifications()">
+                    <i class="fas fa-search"></i> Check Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-hashtag" style="color: var(--primary);"></i> Contract No <span class="required">*</span></label>
+                    <input type="text" id="inpNo" placeholder="e.g. CNT-001">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user" style="color: var(--primary);"></i> Name <span class="required">*</span></label>
+                    <input type="text" id="inpName" placeholder="e.g. Alan">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt" style="color: var(--primary);"></i> Contract Date <span class="required">*</span></label>
+                    <input type="date" id="inpContractDate">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-check" style="color: var(--primary);"></i> Expiry Date</label>
+                    <input type="text" id="inpNextYear" readonly placeholder="Auto-calculated">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note" style="color: var(--primary);"></i> Remark</label>
+                    <input type="text" id="inpRemark" placeholder="Optional notes">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-success" onclick="addRecord()">
+                        <i class="fas fa-plus"></i> Add Contract
+                    </button>
+                    <button class="btn btn-outline" onclick="clearInputs()">
+                        <i class="fas fa-undo"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contract No</th>
+                        <th>Name</th>
+                        <th>Contract Date</th>
+                        <th>Expiry Date</th>
+                        <th>Remark</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="fas fa-file-contract"></i></div>
+                                <h3>No contracts yet</h3>
+                                <p>Add your first contract using the form above</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Modal -->
+<div class="modal-overlay" id="notificationModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell" style="color: var(--primary);"></i> Document Preparation Alerts</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="notificationList">
+            <div style="text-align: center; padding: 40px 0; color: var(--gray-400);">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p style="margin-top: 12px;">Loading notifications...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    let entries = [];
+    let currentFilter = 'all';
+    let filteredEntries = [];
+
+    // Load data on startup
+    window.onload = function() {
+        loadData();
+        updateNotificationCount();
+        setTimeout(checkNotifications, 1000);
+        setInterval(updateNotificationCount, 30000);
+    };
+
+    // Auto-calculate expiry date
+    document.getElementById('inpContractDate').addEventListener('change', function() {
+        const val = this.value;
+        if(val) {
+            const d = new Date(val);
+            d.setFullYear(d.getFullYear() + 1);
+            document.getElementById('inpNextYear').value = d.toISOString().split('T')[0];
+        } else {
+            document.getElementById('inpNextYear').value = "";
+        }
+    });
+
+    // Enter key support
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const active = document.activeElement;
+            if (active.closest('.form-grid')) {
+                addRecord();
+            }
+        }
+    });
+
+    async function loadData() {
+        try {
+            const response = await fetch('/api/records');
+            entries = await response.json();
+            applyFilter(currentFilter);
+            updateStats();
+        } catch (error) {
+            console.error("Error loading data:", error);
+            showToast('error', 'Error', 'Failed to load contracts');
+        }
+    }
+
+    // Filter Functions
+    function applyFilter(filter) {
+        currentFilter = filter;
+        
+        // Update active state on stat items
+        document.querySelectorAll('.stat-item').forEach(item => {
+            item.classList.toggle('active-filter', item.dataset.filter === filter);
+        });
+        
+        // Filter entries
+        if (filter === 'all') {
+            filteredEntries = [...entries];
+        } else {
+            filteredEntries = entries.filter(entry => {
+                const daysLeft = getDaysDiff(entry.nextYear);
+                if (filter === 'active') return daysLeft > 60;
+                if (filter === 'warning') return daysLeft >= 0 && daysLeft <= 60;
+                if (filter === 'overdue') return daysLeft < 0;
+                return true;
+            });
+        }
+        
+        // Update filter info
+        const filterNames = {
+            'all': 'All Contracts',
+            'active': 'Active Contracts (60+ days)',
+            'warning': 'Expiring Soon (≤60 days)',
+            'overdue': 'Overdue Contracts'
+        };
+        document.getElementById('filterDisplay').textContent = filterNames[filter] || 'All Contracts';
+        document.getElementById('filteredCount').textContent = filteredEntries.length;
+        document.getElementById('quickSearchInfo').classList.toggle('active', filter !== 'all');
+        
+        renderTable(filteredEntries);
+    }
+
+    async function addRecord() {
+        const no = document.getElementById('inpNo').value.trim();
+        const name = document.getElementById('inpName').value.trim();
+        const contractDate = document.getElementById('inpContractDate').value;
+        const nextYear = document.getElementById('inpNextYear').value;
+        const remark = document.getElementById('inpRemark').value.trim();
+
+        if (!no || !name || !contractDate) {
+            showToast('warning', 'Missing Fields', 'Please fill in Contract No, Name, and Contract Date.');
+            return;
+        }
+
+        const newEntry = { no, name, contractDate, nextYear, remark: remark || "" };
+
+        try {
+            const response = await fetch('/api/records', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newEntry)
+            });
+            
+            if (response.ok) {
+                clearInputs();
+                await loadData();
+                updateNotificationCount();
+                showToast('success', 'Success', 'Contract added successfully!');
+            } else {
+                showToast('error', 'Error', 'Failed to add contract');
+            }
+        } catch (error) {
+            showToast('error', 'Error', 'Failed to add contract');
+            console.error(error);
+        }
+    }
+
+    async function deleteRecord(index) {
+        if(confirm('Are you sure you want to delete this contract?')) {
+            try {
+                const response = await fetch(`/api/records/${index}`, { method: 'DELETE' });
+                if (response.ok) {
+                    await loadData();
+                    updateNotificationCount();
+                    showToast('success', 'Deleted', 'Contract removed successfully');
+                } else {
+                    showToast('error', 'Error', 'Failed to delete contract');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'Failed to delete contract');
+                console.error(error);
+            }
+        }
+    }
+
+    function clearInputs() {
+        document.getElementById('inpNo').value = "";
+        document.getElementById('inpName').value = "";
+        document.getElementById('inpContractDate').value = "";
+        document.getElementById('inpNextYear').value = "";
+        document.getElementById('inpRemark').value = "";
+        document.getElementById('inpName').focus();
+    }
+
+    function getDaysDiff(targetDateString) {
+        if (!targetDateString) return 999;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const target = new Date(targetDateString);
+        target.setHours(0,0,0,0);
+        return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            const message = currentFilter === 'all' 
+                ? 'No contracts yet. Add your first contract using the form above.'
+                : 'No contracts match this filter. Try clearing the filter.';
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-search"></i></div>
+                            <h3>No results found</h3>
+                            <p>${message}</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        data.forEach((entry, index) => {
+            const daysLeft = getDaysDiff(entry.nextYear);
+            let statusHtml = "";
+
+            if (daysLeft < 0) {
+                statusHtml = `<span class="status-badge status-overdue"><span class="dot"></span> OVERDUE (${Math.abs(daysLeft)} days)</span>`;
+            } else if (daysLeft === 0) {
+                statusHtml = `<span class="status-badge status-warning"><span class="dot"></span> EXPIRES TODAY!</span>`;
+            } else if (daysLeft <= 30) {
+                statusHtml = `<span class="status-badge status-warning"><span class="dot"></span> ${daysLeft} days left</span>`;
+            } else if (daysLeft <= 60) {
+                statusHtml = `<span class="status-badge status-warning"><span class="dot"></span> ${daysLeft} days left</span>`;
+            } else {
+                statusHtml = `<span class="status-badge status-safe"><span class="dot"></span> ${daysLeft} days left</span>`;
+            }
+
+            // Find original index for deletion
+            const originalIndex = entries.indexOf(entry);
+
+            const row = `
+                <tr>
+                    <td class="contract-no">${entry.no}</td>
+                    <td><strong>${entry.name}</strong></td>
+                    <td>${entry.contractDate || entry.signDate || '-'}</td>
+                    <td>${entry.nextYear || '-'}</td>
+                    <td>${entry.remark || '-'}</td>
+                    <td>${statusHtml}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-delete" onclick="deleteRecord(${originalIndex})" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+        document.getElementById('recordCount').textContent = `${data.length} records`;
+    }
+
+    function updateStats() {
+        let total = entries.length;
+        let active = 0;
+        let warning = 0;
+        let overdue = 0;
+
+        entries.forEach(entry => {
+            const daysLeft = getDaysDiff(entry.nextYear);
+            if (daysLeft < 0) overdue++;
+            else if (daysLeft <= 60) warning++;
+            else active++;
+        });
+
+        document.getElementById('totalContracts').textContent = total;
+        document.getElementById('activeContracts').textContent = active;
+        document.getElementById('warningContracts').textContent = warning;
+        document.getElementById('overdueContracts').textContent = overdue;
+    }
+
+    function checkNotifications() {
+        let overdueMsgs = [];
+        let upcomingMsgs = [];
+
+        entries.forEach(entry => {
+            const daysLeft = getDaysDiff(entry.nextYear);
+            if (daysLeft < 0) {
+                overdueMsgs.push(`[${entry.no}] ${entry.name}: OVERDUE by ${Math.abs(daysLeft)} days`);
+            }
+            if (daysLeft >= 0 && daysLeft <= 60) {
+                upcomingMsgs.push(`[${entry.no}] ${entry.name}: ${daysLeft} days until expiry`);
+            }
+        });
+
+        let message = "";
+        if (overdueMsgs.length > 0) {
+            message += "🚨 OVERDUE CONTRACTS:\n\n" + overdueMsgs.join("\n") + "\n\n";
+        }
+        if (upcomingMsgs.length > 0) {
+            message += "📄 EXPIRING SOON (≤60 days):\n\n" + upcomingMsgs.join("\n");
+        }
+
+        if (message) {
+            alert(message);
+            showToast('warning', 'Notification Check', `${overdueMsgs.length + upcomingMsgs.length} alerts found`);
+        } else {
+            showToast('success', 'All Clear', 'No contracts expiring within 60 days');
+        }
+        
+        updateNotificationCount();
+    }
+
+    async function updateNotificationCount() {
+        try {
+            const response = await fetch('/api/notifications');
+            const notifications = await response.json();
+            let total = 0;
+            if (Array.isArray(notifications)) {
+                notifications.forEach(item => {
+                    if (item.notifications && Array.isArray(item.notifications)) {
+                        total += item.notifications.length;
+                    }
+                });
+            }
+            document.getElementById('notificationCount').textContent = total || 0;
+            return notifications;
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+            document.getElementById('notificationCount').textContent = '0';
+            return [];
+        }
+    }
+
+    async function showNotifications() {
+        const modal = document.getElementById('notificationModal');
+        const list = document.getElementById('notificationList');
+        
+        modal.classList.add('active');
+        list.innerHTML = '<div style="text-align: center; padding: 40px 0; color: var(--gray-400);"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top: 12px;">Loading notifications...</p></div>';
+        
+        try {
+            const response = await fetch('/api/notifications');
+            const notifications = await response.json();
+            
+            if (!notifications || notifications.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--gray-400);">
+                        <i class="fas fa-bell-slash" style="font-size: 48px; margin-bottom: 16px;"></i>
+                        <p>No document preparation alerts yet.</p>
+                        <p style="font-size: 13px; margin-top: 8px;">Notifications will be generated at 9:30 AM and 4:30 PM daily.</p>
+                    </div>
+                `;
+            } else {
+                const reversed = notifications.reverse();
+                let totalOverdue = 0;
+                let totalUpcoming = 0;
+                
+                reversed.forEach(notification => {
+                    if (notification.overdue_count) totalOverdue += notification.overdue_count;
+                    if (notification.upcoming_count) totalUpcoming += notification.upcoming_count;
+                });
+                
+                let html = '';
+                
+                if (totalOverdue > 0 || totalUpcoming > 0) {
+                    html += `
+                        <div class="notification-summary">
+                            <div class="notification-summary-card overdue">
+                                <div class="number">${totalOverdue}</div>
+                                <div class="label">⚠️ Overdue</div>
+                            </div>
+                            <div class="notification-summary-card upcoming">
+                                <div class="number">${totalUpcoming}</div>
+                                <div class="label">📄 Upcoming (≤60 days)</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                reversed.forEach(notification => {
+                    const time = notification.timestamp || 'Unknown time';
+                    const items = notification.notifications || [];
+                    
+                    if (items.length === 0) return;
+                    
+                    html += `<div class="notification-group">`;
+                    html += `<div class="notification-group-header"><i class="far fa-clock"></i> ${time} (${items.length} alert${items.length > 1 ? 's' : ''})</div>`;
+                    
+                    items.forEach(item => {
+                        const typeClass = item.type === 'overdue' ? 'overdue' : 'upcoming';
+                        const actionClass = item.type === 'overdue' ? 'urgent' : 'prepare';
+                        const actionText = item.type === 'overdue' ? '⚠️ URGENT - Prepare documents now!' : '📄 Start document preparation';
+                        
+                        html += `
+                            <div class="notification-item ${typeClass}">
+                                <div class="title">${item.no} - ${item.name}</div>
+                                <div class="message">${item.message}</div>
+                                <span class="action ${actionClass}">${actionText}</span>
+                                <div class="meta">
+                                    <i class="fas fa-calendar-alt"></i> Contract: ${item.contract_date || 'N/A'} &nbsp;|&nbsp; <i class="fas fa-calendar-check"></i> Expiry: ${item.expiry_date || 'N/A'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                });
+                
+                list.innerHTML = html;
+            }
+        } catch (error) {
+            console.error("Error loading notifications:", error);
+            list.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--danger);">
+                    <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                    <p>Error loading notifications. Please try again.</p>
+                </div>
+            `;
+        }
+    }
+
+    async function clearAllNotifications() {
+        if (confirm('Are you sure you want to clear ALL notification history?')) {
+            try {
+                const response = await fetch('/api/notifications/clear', { method: 'DELETE' });
+                if (response.ok) {
+                    await updateNotificationCount();
+                    closeModal();
+                    showToast('success', 'Cleared', 'All notifications cleared');
+                } else {
+                    showToast('error', 'Error', 'Failed to clear notifications');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'Failed to clear notifications');
+                console.error(error);
+            }
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('notificationModal').classList.remove('active');
+    }
+
+    // Close modal on overlay click
+    document.getElementById('notificationModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Toast System
+    function showToast(type, title, message) {
+        const container = document.getElementById('toastContainer');
+        const icons = {
+            success: 'fas fa-check-circle',
+            error: 'fas fa-exclamation-circle',
+            warning: 'fas fa-exclamation-triangle'
+        };
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon"><i class="${icons[type] || icons.success}"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100px)';
+            setTimeout(() => toast.remove(), 400);
+        }, 4000);
+    }
+
+    // Keyboard shortcut: Escape to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+</script>
+
+</body>
+</html>
